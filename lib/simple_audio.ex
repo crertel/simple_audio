@@ -18,7 +18,7 @@ defmodule SimpleAudio do
   def pause_sound(sound_instance) do
   end
 
-  def set_volumne(sound_instance, volume) do
+  def set_volume(sound_instance, volume) do
   end
 
   def set_panning(sound_instance, panning) do

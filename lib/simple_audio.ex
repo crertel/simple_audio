@@ -1,18 +1,32 @@
 defmodule SimpleAudio do
   @moduledoc """
-  Documentation for SimpleAudio.
+  Basic interfaces for simple audio.
   """
 
-  @doc """
-  Hello world.
+  def load_sound_from_binary(sound_info, sound_data) do
+  end
 
-  ## Examples
+  def play_sound(sound_instance) do
+  end
 
-      iex> SimpleAudio.hello()
-      :world
+  def loop_sound(sound_instance) do
+  end
 
-  """
-  def hello do
-    :world
+  def stop_sound(sound_instance) do
+  end
+
+  def pause_sound(sound_instance) do
+  end
+
+  def set_volumne(sound_instance, volume) do
+  end
+
+  def set_panning(sound_instance, panning) do
+  end
+
+  def set_frequency(sound_instance, frequency) do
+  end
+
+  def get_status(sound_instance) do
   end
 end

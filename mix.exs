@@ -6,7 +6,6 @@ defmodule SimpleAudio.MixProject do
       app: :simple_audio,
       version: "0.1.0",
       elixir: "~> 1.7",
-      start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
   end
@@ -14,6 +13,7 @@ defmodule SimpleAudio.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
+      mod: {SimpleAudio.Application, []},
       extra_applications: [:logger]
     ]
   end

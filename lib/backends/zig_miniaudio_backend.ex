@@ -1,4 +1,4 @@
-defmodule SimpleAudio.Backend do
+defmodule SimpleAudio.Backend.ZigMiniaudio do
   # use Zig
 
   @moduledoc """

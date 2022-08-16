@@ -3,29 +3,16 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
   The low-level backend, in Zig, for simple audio.
   """
 
-  # ,
-  use Zig
-  # libs: [],
-  # include: ["miniaudio.h"],
-  # link_libc: true
+  use Zig,
+    sources: ["miniaudio.c"],
+    c_includes: [ma: "miniaudio.h"],
+    link_libc: true
 
   ~Z"""
-  const miniaudio = @cImport({
-    @cInclude("miniaudio.h");
-  });
+  const maz = @import("miniaudio.zig");
 
   /// nif: init/0
   fn init(env: beam.env) !beam.term {
-    var eng: ?*miniaudio.ma_engine;
-
-    var res = miniaudio.ma_engine_init(null, &eng);
-    if (res != miniaudio.MA_SUCCESS) {
-      return beam.make_error_binary(env, "FAILURE");
-    }
-
-    miniaudio.ma_engine_play_sound(&eng, "wave.wav", null);
-    miniaudio.ma_engine_uninit(&eng);
-
 
     return beam.make_error_binary(env, "SUCCESS");
   }

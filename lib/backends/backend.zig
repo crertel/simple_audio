@@ -88,6 +88,17 @@ const AudioState = struct {
 };
 
 pub fn run(allocator: std.mem.Allocator) !void {
-    var audioState = try AudioState.create(allocator);
-    defer audioState.destroy(allocator);
+    var audio = try AudioState.create(allocator);
+    try audio.engine.start();
+
+        
+    const music = try audio.engine.createSoundFromFile(
+        allocator,
+        "assets/loop.wav",
+        .{ .flags = .{ .stream = true } },
+    );
+    music.setVolume(0.25);
+    try music.start();
+
+    defer audio.destroy(allocator);
 }

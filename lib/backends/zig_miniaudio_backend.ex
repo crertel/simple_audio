@@ -4,6 +4,17 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
   """
 
   use Zig,
+    sources: [
+      {"miniaudio.c",
+       [
+         "-DMA_NO_WEBAUDIO",
+         "-DMA_NO_ENCODING",
+         "-DMA_NO_NULL",
+         "-DMA_NO_JACK",
+         "-fno-sanitize=undefined"
+       ]},
+      "cabi_workarounds.c"
+    ],
     link_libc: true
 
   ~Z"""

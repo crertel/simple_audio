@@ -1,11 +1,8 @@
 const std = @import("std");
 const assert = std.debug.assert;
 const math = std.math;
-const c = if (@import("builtin").zig_backend == .stage1)
-    @cImport(@cInclude("miniaudio.h"))
-else
-    @import("cimport_stage2.zig");
-
+const c = @cImport(@cInclude("miniaudio.h"));
+    
 // TODO: Get rid of WA_ma_* functions which are workarounds for Zig C ABI issues on aarch64.
 
 pub const SoundFlags = packed struct {
@@ -76,20 +73,14 @@ pub const DeviceState = enum(u32) {
 pub const Channel = c.ma_channel;
 
 pub const PlaybackCallback = struct {
-    const CbType = if (@import("builtin").zig_backend == .stage1)
-        fn (context: ?*anyopaque, outptr: *anyopaque, num_frames: u32) void
-    else
-        *const fn (context: ?*anyopaque, outptr: *anyopaque, num_frames: u32) void;
-
+    const CbType =  fn (context: ?*anyopaque, outptr: *anyopaque, num_frames: u32) void;
     context: ?*anyopaque = null,
     callback: ?CbType = null,
 };
 
 pub const CaptureCallback = struct {
-    const CbType = if (@import("builtin").zig_backend == .stage1)
-        fn (context: ?*anyopaque, inptr: *const anyopaque, num_frames: u32) void
-    else
-        *const fn (context: ?*anyopaque, inptr: *const anyopaque, num_frames: u32) void;
+    const CbType =  fn (context: ?*anyopaque, inptr: *const anyopaque, num_frames: u32) void;
+    
 
     context: ?*anyopaque = null,
     callback: ?CbType = null,
@@ -864,7 +855,7 @@ const DeviceImpl = opaque {
     };
 
     fn internalDataCallback(
-        raw_device: if (@import("builtin").zig_backend == .stage1) ?*c.ma_device else *anyopaque,
+        raw_device: ?*c.ma_device,
         outptr: ?*anyopaque,
         inptr: ?*const anyopaque,
         num_frames: u32,

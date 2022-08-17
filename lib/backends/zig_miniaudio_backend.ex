@@ -3,13 +3,15 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
   The low-level backend, in Zig, for simple audio.
   """
 
-  use Zig
+  use Zig,
+    link_libc: true
 
   ~Z"""
+  const be = @import("backend.zig");
 
   /// nif: init/0
   fn init(env: beam.env) !beam.term {
-
+    try be.run(beam.allocator);
     return beam.make_error_binary(env, "SUCCESS");
   }
 

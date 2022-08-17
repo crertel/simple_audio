@@ -3,13 +3,9 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
   The low-level backend, in Zig, for simple audio.
   """
 
-  use Zig,
-    sources: ["miniaudio.c"],
-    c_includes: [ma: "miniaudio.h"],
-    link_libc: true
+  use Zig
 
   ~Z"""
-  const maz = @import("miniaudio.zig");
 
   /// nif: init/0
   fn init(env: beam.env) !beam.term {

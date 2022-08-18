@@ -20,15 +20,36 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
   ~Z"""
   const be = @import("backend.zig");
 
-  /// nif: init/0
-  fn init(env: beam.env) !beam.term {
-    try be.run(beam.allocator);
-    return beam.make_error_binary(env, "SUCCESS");
+  /// resource: audio_engine_res definition
+  const audio_engine_res = *be.AudioState;
+
+  /// resource: audio_engine_res cleanup
+  fn audio_engine_res_cleanup(_: beam.env, audio: *audio_engine_res) void {
+    audio.*.destroy(beam.allocator);
   }
 
-  /// nif: shutdown/0
-  fn shutdown(env: beam.env) !beam.term {
-    return beam.make_error_binary(env, "NYI");
+  /// nif: create_engine/0
+  fn create_engine(env: beam.env) beam.term {
+    var audio = be.AudioState.create(beam.allocator) catch {
+      return beam.raise_resource_error(env);
+    };
+    audio.engine.start() catch {
+      defer audio.destroy(beam.allocator);
+      return beam.raise_resource_error(env);
+    };
+
+    return __resource__.create(audio_engine_res, env, audio) catch {
+      defer audio.destroy(beam.allocator);
+      return beam.raise_resource_error(env);
+    };
+  }
+
+  /// nif: destroy_engine/1
+  fn destroy_engine(env: beam.env, audio: beam.term) !beam.term {
+    var result = __resource__.fetch(audio_engine_res, env, audio)
+      catch return beam.raise_resource_error(env);
+    result.destroy(beam.allocator);
+    return beam.make_ok(env);
   }
 
   /// nif: load/1

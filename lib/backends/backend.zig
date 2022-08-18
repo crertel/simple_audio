@@ -4,7 +4,7 @@ const math = std.math;
 const assert = std.debug.assert;
 const Mutex = std.Thread.Mutex;
 
-const AudioState = struct {
+pub const AudioState = struct {
     const num_sets = 100;
     const samples_per_set = 512;
     const usable_samples_per_set = 480;
@@ -37,7 +37,7 @@ const AudioState = struct {
         }
     }
 
-    fn create(allocator: std.mem.Allocator) !*AudioState {
+    pub fn create(allocator: std.mem.Allocator) !*AudioState {
         const samples = samples: {
             var samples = std.ArrayList(f32).initCapacity(
                 allocator,
@@ -79,7 +79,7 @@ const AudioState = struct {
         return audio;
     }
 
-    fn destroy(audio: *AudioState, allocator: std.mem.Allocator) void {
+    pub fn destroy(audio: *AudioState, allocator: std.mem.Allocator) void {
         audio.samples.deinit();
         audio.engine.destroy(allocator);
         audio.device.destroy(allocator);
@@ -87,18 +87,3 @@ const AudioState = struct {
     }
 };
 
-pub fn run(allocator: std.mem.Allocator) !void {
-    var audio = try AudioState.create(allocator);
-    try audio.engine.start();
-
-        
-    const music = try audio.engine.createSoundFromFile(
-        allocator,
-        "assets/loop.wav",
-        .{ .flags = .{ .stream = true } },
-    );
-    music.setVolume(0.25);
-    try music.start();
-
-    defer audio.destroy(allocator);
-}

@@ -1,4 +1,4 @@
-const zaudio = @import("zaudio.zig");
+pub const zaudio = @import("zaudio.zig");
 const std = @import("std");
 const math = std.math;
 const assert = std.debug.assert;

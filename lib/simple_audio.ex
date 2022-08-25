@@ -3,6 +3,15 @@ defmodule SimpleAudio do
   Basic interfaces for simple audio.
   """
 
+  use GenServer
+
+  require Record
+
+  Record.defrecord(:simple_audio, engine: nil)
+  @type simple_audio :: record(:simple_audio, engine: term())
+
+  alias SimpleAudio.Backend.ZigMiniaudio, as: ZMA
+
   @typedoc """
   A source from which a sound resource is loaded.
 
@@ -78,4 +87,67 @@ defmodule SimpleAudio do
           pitch: pitch(),
           volume: volume()
         }
+
+  @spec start_link([{atom(), any()}]) :: {:error, any()} | {:ok, pid}
+  def start_link(_opts \\ []) do
+    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  end
+
+  @spec load(source()) :: {:ok, resource()} | {:error, binary()}
+  def load(source) do
+    GenServer.call(__MODULE__, {:load, source})
+  end
+
+  @spec instantiate(resource()) :: {:ok, instance()} | {:error, binary()}
+  def instantiate(resource), do: GenServer.call(__MODULE__, {:instantiate, resource})
+
+  @spec set_state(instance(), instance_state()) ::
+          :ok | {:error, binary()}
+  def set_state(sound, state), do: GenServer.call(__MODULE__, {:set_state, sound, state})
+
+  @spec set_volume(instance(), volume()) :: :ok | {:error, binary()}
+  def set_volume(sound, volume), do: GenServer.call(__MODULE__, {:set_volume, sound, volume})
+
+  @spec set_panning(instance(), volume()) :: :ok | {:error, binary()}
+  def set_panning(sound, panning), do: GenServer.call(__MODULE__, {:set_panning, sound, panning})
+
+  @spec set_pitch(instance(), pitch()) :: :ok | {:error, binary()}
+  def set_pitch(sound, pitch), do: GenServer.call(__MODULE__, {:set_pitch, sound, pitch})
+
+  @spec get_status(instance()) :: {:ok, status()} | {:error, binary()}
+  def get_status(sound), do: GenServer.call(__MODULE__, {:get_status, sound})
+
+  @spec init(any) :: none
+  def init(_) do
+    {:ok, simple_audio(engine: ZMA.create_engine())}
+  end
+
+  def handle_call({:load, {:file, file_path}}, _from, simple_audio(engine: engine) = s) do
+    {:reply, {:ok, ZMA.load_from_path(engine, file_path)}, s}
+  end
+
+  def handle_call({:instantiate, resource}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.instantiate(resource)}, s}
+  end
+
+  def handle_call({:set_state, sound, _state}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.play(sound)}, s}
+  end
+
+  def handle_call({:set_volume, sound, volume}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.set_volume(sound, volume)}, s}
+  end
+
+  def handle_call({:set_panning, sound, panning}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.set_panning(sound, panning)}, s}
+  end
+
+  def handle_call({:set_pitch, sound, pitch}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.set_pitch(sound, pitch)}, s}
+  end
+
+  def handle_call({:get_status, _sound}, _from, simple_audio(engine: _engine) = s) do
+    ret = {:error, "nyi"}
+    {:reply, ret, s}
+  end
 end

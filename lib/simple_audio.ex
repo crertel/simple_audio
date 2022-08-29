@@ -94,6 +94,12 @@ defmodule SimpleAudio do
   @spec get_duration(instance()) :: {:ok, sound_duration()} | {:error, binary()}
   def get_duration(sound), do: GenServer.call(__MODULE__, {:get_duration, sound})
 
+  @spec play(instance()) :: :ok | {:error, binary()}
+  def play(sound), do: GenServer.call(__MODULE__, {:play, sound})
+
+  @spec stop(instance()) :: :ok | {:error, binary()}
+  def stop(sound), do: GenServer.call(__MODULE__, {:play, sound})
+
   @spec init(any) :: none
   def init(_) do
     {:ok, simple_audio(engine: ZMA.create_engine())}
@@ -121,5 +127,13 @@ defmodule SimpleAudio do
 
   def handle_call({:get_duration, sound}, _from, simple_audio(engine: _engine) = s) do
     {:reply, {:ok, ZMA.get_duration(sound)}, s}
+  end
+
+  def handle_call({:play, sound}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.play(sound)}, s}
+  end
+
+  def handle_call({:stop, sound}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.stop(sound)}, s}
   end
 end

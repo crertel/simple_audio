@@ -76,10 +76,25 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
     };
   }
 
-  /// nif: instantiate/1
-  fn instantiate(env: beam.env, resource: beam.term) !beam.term {
-    _ = resource;
-    return beam.make_error_binary(env, "NYI");
+  /// nif: instantiate/2
+  fn instantiate(env: beam.env, audio_engine: beam.term, source: beam.term) !beam.term {
+    var engine = __resource__.fetch(audio_engine_res, env, audio_engine)
+      catch return beam.raise_resource_error(env);
+
+    var source_sound_instance = __resource__.fetch(sound_res, env, source)
+      catch return beam.raise_resource_error(env);
+
+    var new_sound_instance = engine.engine.createSoundCopy( beam.allocator,
+                                                            source_sound_instance,
+                                                            zaudio.SoundFlags{},
+                                                            null
+                                                            )
+                              catch return beam.raise_resource_error(env);
+
+    return __resource__.create(sound_res, env, new_sound_instance) catch {
+      defer new_sound_instance.destroy(beam.allocator);
+      return beam.raise_resource_error(env);
+    };
   }
 
   /// nif: set_volume/2

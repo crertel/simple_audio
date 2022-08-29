@@ -126,8 +126,8 @@ defmodule SimpleAudio do
     {:reply, {:ok, ZMA.load_from_path(engine, file_path)}, s}
   end
 
-  def handle_call({:instantiate, resource}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.instantiate(resource)}, s}
+  def handle_call({:instantiate, resource}, _from, simple_audio(engine: engine) = s) do
+    {:reply, {:ok, ZMA.instantiate(engine, resource)}, s}
   end
 
   def handle_call({:set_state, sound, _state}, _from, simple_audio(engine: _engine) = s) do

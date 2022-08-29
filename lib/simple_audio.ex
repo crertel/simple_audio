@@ -114,15 +114,18 @@ defmodule SimpleAudio do
   end
 
   def handle_call({:set_volume, sound, volume}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.set_volume(sound, volume)}, s}
+    ZMA.set_volume(sound, max(0.0, min(volume, 1.0)))
+    {:reply, :ok, s}
   end
 
   def handle_call({:set_panning, sound, panning}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.set_panning(sound, panning)}, s}
+    ZMA.set_panning(sound, max(-1.0, min(panning, 1.0)))
+    {:reply, :ok, s}
   end
 
   def handle_call({:set_pitch, sound, pitch}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.set_pitch(sound, pitch)}, s}
+    ZMA.set_pitch(sound, max(0.0, pitch))
+    {:reply, :ok, s}
   end
 
   def handle_call({:get_duration, sound}, _from, simple_audio(engine: _engine) = s) do
@@ -130,10 +133,12 @@ defmodule SimpleAudio do
   end
 
   def handle_call({:play, sound}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.play(sound)}, s}
+    ZMA.play(sound)
+    {:reply, :ok, s}
   end
 
   def handle_call({:stop, sound}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.stop(sound)}, s}
+    ZMA.stop(sound)
+    {:reply, :ok, s}
   end
 end

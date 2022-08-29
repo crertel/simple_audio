@@ -94,9 +94,8 @@ defmodule SimpleAudio do
   end
 
   @spec load(source()) :: {:ok, resource()} | {:error, binary()}
-  def load(source) do
-    GenServer.call(__MODULE__, {:load, source})
-  end
+  def load({:file, path} = res) when is_binary(path), do: GenServer.call(__MODULE__, {:load, res})
+  def load(_), do: {:error, "Invalid source."}
 
   @spec instantiate(resource()) :: {:ok, instance()} | {:error, binary()}
   def instantiate(resource), do: GenServer.call(__MODULE__, {:instantiate, resource})
@@ -106,13 +105,15 @@ defmodule SimpleAudio do
   def set_state(sound, state), do: GenServer.call(__MODULE__, {:set_state, sound, state})
 
   @spec set_volume(instance(), volume()) :: :ok | {:error, binary()}
-  def set_volume(sound, volume), do: GenServer.call(__MODULE__, {:set_volume, sound, volume})
+  def set_volume(sound, volume),
+    do: GenServer.call(__MODULE__, {:set_volume, sound, 1.0 * volume})
 
   @spec set_panning(instance(), volume()) :: :ok | {:error, binary()}
-  def set_panning(sound, panning), do: GenServer.call(__MODULE__, {:set_panning, sound, panning})
+  def set_panning(sound, panning),
+    do: GenServer.call(__MODULE__, {:set_panning, sound, 1.0 * panning})
 
   @spec set_pitch(instance(), pitch()) :: :ok | {:error, binary()}
-  def set_pitch(sound, pitch), do: GenServer.call(__MODULE__, {:set_pitch, sound, pitch})
+  def set_pitch(sound, pitch), do: GenServer.call(__MODULE__, {:set_pitch, sound, 1.0 * pitch})
 
   @spec get_status(instance()) :: {:ok, status()} | {:error, binary()}
   def get_status(sound), do: GenServer.call(__MODULE__, {:get_status, sound})

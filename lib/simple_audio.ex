@@ -74,6 +74,11 @@ defmodule SimpleAudio do
   @type pitch :: float()
 
   @typedoc """
+  The duration of a sound instance, in seconds.
+  """
+  @type sound_duration :: float()
+
+  @typedoc """
   The status of a sound instance.
 
   * `state` is the instance state of the instance (playing, paused, stopped, etc.)
@@ -118,6 +123,9 @@ defmodule SimpleAudio do
   @spec get_status(instance()) :: {:ok, status()} | {:error, binary()}
   def get_status(sound), do: GenServer.call(__MODULE__, {:get_status, sound})
 
+  @spec get_duration(instance()) :: {:ok, sound_duration()} | {:error, binary()}
+  def get_duration(sound), do: GenServer.call(__MODULE__, {:get_duration, sound})
+
   @spec init(any) :: none
   def init(_) do
     {:ok, simple_audio(engine: ZMA.create_engine())}
@@ -145,6 +153,10 @@ defmodule SimpleAudio do
 
   def handle_call({:set_pitch, sound, pitch}, _from, simple_audio(engine: _engine) = s) do
     {:reply, {:ok, ZMA.set_pitch(sound, pitch)}, s}
+  end
+
+  def handle_call({:get_duration, sound}, _from, simple_audio(engine: _engine) = s) do
+    {:reply, {:ok, ZMA.get_duration(sound)}, s}
   end
 
   def handle_call({:get_status, _sound}, _from, simple_audio(engine: _engine) = s) do

@@ -153,6 +153,16 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
     return beam.make_ok(env);
   }
 
+  /// nif: stop/1
+  fn stop(env: beam.env, sound_resource: beam.term) !beam.term {
+    var sound = __resource__.fetch(sound_res, env, sound_resource)
+      catch return beam.raise_resource_error(env);
+
+    try sound.stop();
+
+    return beam.make_ok(env);
+  }
+
   /// nif: get_duration/1
   fn get_duration(env: beam.env, sound_resource: beam.term) !beam.term {
     var sound = __resource__.fetch(sound_res, env, sound_resource)

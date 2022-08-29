@@ -84,9 +84,12 @@ defmodule SimpleAudio.Backend.ZigMiniaudio do
     var source_sound_instance = __resource__.fetch(sound_res, env, source)
       catch return beam.raise_resource_error(env);
 
+      var flags = zaudio.SoundFlags{};
+      flags.no_spatialization = true;
+
     var new_sound_instance = engine.engine.createSoundCopy( beam.allocator,
                                                             source_sound_instance,
-                                                            zaudio.SoundFlags{},
+                                                            flags,
                                                             null
                                                             )
                               catch return beam.raise_resource_error(env);

@@ -2,7 +2,6 @@ defmodule SimpleAudio do
   @moduledoc """
   Basic interfaces for simple audio.
   """
-
   use GenServer
 
   require Record
@@ -39,15 +38,6 @@ defmodule SimpleAudio do
   @opaque instance :: reference()
 
   @typedoc """
-  The state of a sound instance.
-
-  * `:stopped` means that the sound is currently stopped and reset to the beginning of its clip.
-  * `:playing` means that the sound is currently playing.
-  * `:paused` means that the sound is currently stopped, but may resume playing where it left off.
-  """
-  @type instance_state :: :stopped | :playing | :paused
-
-  @typedoc """
   The volume of a sound instance.
 
   This is a floating point number on the range `[0.0, 1.0]`, fully muted to fully loud respectively.
@@ -78,21 +68,6 @@ defmodule SimpleAudio do
   """
   @type sound_duration :: float()
 
-  @typedoc """
-  The status of a sound instance.
-
-  * `state` is the instance state of the instance (playing, paused, stopped, etc.)
-  * `panning` is the current panning of the instance
-  * `pitch` is the current pitch multiplier of the sound
-  * `volume` is the current volume of the sound
-  """
-  @type status :: %{
-          state: instance_state(),
-          panning: panning(),
-          pitch: pitch(),
-          volume: volume()
-        }
-
   @spec start_link([{atom(), any()}]) :: {:error, any()} | {:ok, pid}
   def start_link(_opts \\ []) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -105,10 +80,6 @@ defmodule SimpleAudio do
   @spec instantiate(resource()) :: {:ok, instance()} | {:error, binary()}
   def instantiate(resource), do: GenServer.call(__MODULE__, {:instantiate, resource})
 
-  @spec set_state(instance(), instance_state()) ::
-          :ok | {:error, binary()}
-  def set_state(sound, state), do: GenServer.call(__MODULE__, {:set_state, sound, state})
-
   @spec set_volume(instance(), volume()) :: :ok | {:error, binary()}
   def set_volume(sound, volume),
     do: GenServer.call(__MODULE__, {:set_volume, sound, 1.0 * volume})
@@ -119,9 +90,6 @@ defmodule SimpleAudio do
 
   @spec set_pitch(instance(), pitch()) :: :ok | {:error, binary()}
   def set_pitch(sound, pitch), do: GenServer.call(__MODULE__, {:set_pitch, sound, 1.0 * pitch})
-
-  @spec get_status(instance()) :: {:ok, status()} | {:error, binary()}
-  def get_status(sound), do: GenServer.call(__MODULE__, {:get_status, sound})
 
   @spec get_duration(instance()) :: {:ok, sound_duration()} | {:error, binary()}
   def get_duration(sound), do: GenServer.call(__MODULE__, {:get_duration, sound})
@@ -139,10 +107,6 @@ defmodule SimpleAudio do
     {:reply, {:ok, ZMA.instantiate(engine, resource)}, s}
   end
 
-  def handle_call({:set_state, sound, _state}, _from, simple_audio(engine: _engine) = s) do
-    {:reply, {:ok, ZMA.play(sound)}, s}
-  end
-
   def handle_call({:set_volume, sound, volume}, _from, simple_audio(engine: _engine) = s) do
     {:reply, {:ok, ZMA.set_volume(sound, volume)}, s}
   end
@@ -157,10 +121,5 @@ defmodule SimpleAudio do
 
   def handle_call({:get_duration, sound}, _from, simple_audio(engine: _engine) = s) do
     {:reply, {:ok, ZMA.get_duration(sound)}, s}
-  end
-
-  def handle_call({:get_status, _sound}, _from, simple_audio(engine: _engine) = s) do
-    ret = {:error, "nyi"}
-    {:reply, ret, s}
   end
 end

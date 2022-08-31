@@ -19,3 +19,6 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/simple_audio](https://hexdocs.pm/simple_audio).
 
+## Attributions
+
+* `goose_honk.wav` is adapted from ["Canadian Geese Honk" by Tony Phillips](https://soundbible.com/1202-Canadian-Geese-Honk.html), License Attribution 3.0.
